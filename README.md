@@ -187,6 +187,30 @@ on the rotary switch was higher than what it was currently getting in my setup.
 The solution after some simple testing was to add pull-up resistors to bring up the voltage on each of the 8 input 
 channels on the encoder which has since required a review of the perfboard layout that has not been done yet. 
 
+### Pull-up Resistors and Common Node Issues
+After realizing the solution to the issues I faced with the rotary switch simply required adding in pull-up resistors
+to the inputs of the priority encoder, I went ahead and soldered another perf board, this time with only one pull-up 
+resistor on each half of the board. This way I thought I could then connect 4 wires from the resistor to each of the 4
+priority encoder inputs on each half. However, this quickly proved to be a problem because any Low signal sent to one of
+the 4 inputs on a half of the board was shared with the others as well. Meaning a Low signal sent to input 4 propagated
+to inputs 5, 6, and 7. 
+
+It appeared that I had two courses of action I could take, either connect resistors directly from the power rails on the
+perf board to the priority encoder inputs, requiring 8 resistors, or I could somewhat continue my original plan of having 
+2 resistors from the power rails but now diodes between the resistor common node and the priority encoder inputs to prevent,
+back flow of the Low signal to the other inputs, requiring 2 resistors and 8 diodes. To decide, I posed the question to 
+an LLM with the situation, my findings and what I thought were the only two options but asked for additional insight. It 
+responded saying the best option in this scenario was to go the 8 resistor route, and that's what I did. 
+
+Ultimately I had failed to think about how having a common node for each half of the board could be affected by a low signal
+getting passed between all the shared nodes. If I had done more extensive breadboard work earlier on then I perhaps could
+have discovered this issue and solved it before once again soldering and then discovering a problem. 
+
+I also discovered the importance of keeping the wires you are soldering neat while performing the final tests on the rotary
+switch on the perf board. All the wires from the rotary switch are threaded flexible wires and I didn't properly tighten
+one of them so there were extra strands that were loose and connecting to nearby inputs and disrupting the signals.
+
+
 ## Next steps
 ### Priority Encoder Changes
 As I discovered with the priority encoder, the 8 inputs need higher idle voltages than they were originally getting, and
