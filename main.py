@@ -1,12 +1,8 @@
 from game import Game
 from lcd_wrapper import LCDWrapper
 from machine import Pin
-# TODO: rename rotary encoder file
-# TODO: rotary_encoder_new_class doesn't even match any of the rotary encoder files
-from rotary_encoder_new_class import RotaryEncoder
-# TODO: rename webserver class
-# TODO: webserver_new_class also doesn't match any available files
-from webserver_new_class import Webserver
+from rotary_encoder import RotaryEncoder
+from webserver import Webserver
 from games_db_wrapper import DBWrapper
 
 
@@ -23,9 +19,6 @@ def encoder_handler(pin):
     # Read the current states of the CLK and DT pins
     clk_state = re.clk_pin.value()
     dt_state = re.dt_pin.value()
-
-    # TODO: the button handler func sets the interrupts handlers to None to prevent overlapping interrupts but this func
-    # TODO: doesn't have it, should it? is it necessary?
 
     # TODO: I don't love the variable name displaying_ip because it could display anything other than duration
     # The IP and Game result are not being displayed, check the encoder values and update LCD
