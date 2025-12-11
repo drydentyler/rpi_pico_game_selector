@@ -75,37 +75,19 @@ def button_handler(pin):
     # TODO: maybe make pressing the button cycle through the duration/ip/game name, that way you can always return to see the ip address for the webserver
 
     # Will need access to the LCD, Rotary Encoder, Database, and displaying_ip bool
-    global lcd, displaying_ip, re, db
+    global re, display_index, displays
 
     # Temporarily set the button handler function to None to prevent conflicting function calls
     re.sw_pin.irq(handler=None)
 
     # If button current state is High and previous state was low
     if re.sw_pin.value() == 1 and re.prev_button_state == 0:
-        # TODO: functionally these top two conditions are the same, condense them somehow
-        # If the IP is currently displayed, replace with the duration display
-        if displaying_ip:
-            lcd.display_duration(re.qtr_counter)
-            displaying_ip = False
-        else:
-            # Else a game result is displayed, replace with the duration display
-            if re.button_pressed:
-                lcd.display_duration(re.qtr_counter)
-                re.button_pressed = False
-            else:
-                # Otherwise, get the additional parameter readings to query the database
-                # Check the complexity toggle state, High->True, Low->False
-                # is_complex = complexity_toggle.value()
-                # TODO: need to incorporate the objects for the players rotary switch and complexity toggle
-                # TODO: Replace the complexity parameter with the reading from the toggle and players rotary switch
-                game = db.get_random_game(players=get_players(), duration=re.qtr_counter, complexity=False)
-
-                # Display the game selected from the database
-                lcd.display_game(game)
-
-                # Set the previous button state and displaying result to True(1)
-                re.prev_button_state = 1
-                re.button_pressed = True
+        
+        if display_index == 2:
+            displays[display_index][1] = get_random_game_wrapper()
+        
+        set_display()
+            
     elif re.sw_pin.value() == 0 and re.prev_button_state == 1:
         re.prev_button_state = 0
 
