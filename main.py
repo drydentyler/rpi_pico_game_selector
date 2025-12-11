@@ -64,10 +64,13 @@ def get_players() -> int:
     
     return (curr_a2*4)+(curr_a1*2)+curr_a0+1
 
-def get_random_game_wrapper():
-    global db, re
-    return db.get_random_game(players=get_players(), duration=re.qtr_counter, complexity=False)
-
+def get_random_game_wrapper(qtr_counter: int):
+    """
+    Wrapper function to the database call to get the randomly selected game
+    """
+    global db
+    print(qtr_counter)
+    return db.get_random_game(players=get_players(), duration=qtr_counter, complexity=False)
 
 def button_handler(pin):
     """
