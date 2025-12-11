@@ -20,9 +20,6 @@ def encoder_handler(pin):
     clk_state = re.clk_pin.value()
     dt_state = re.dt_pin.value()
 
-    # TODO: the button handler func sets the interrupts handlers to None to prevent overlapping interrupts but this func
-    # TODO: doesn't have it, should it? is it necessary?
-
     # TODO: I don't love the variable name displaying_ip because it could display anything other than duration
     # The IP and Game result are not being displayed, check the encoder values and update LCD
     if not displaying_ip and not re.button_pressed:
