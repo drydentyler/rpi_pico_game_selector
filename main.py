@@ -111,7 +111,7 @@ def button_handler(pin):
             displays[display_index][1] = get_random_game_wrapper(re.qtr_counter)
         
         set_display()
-            
+        re.prev_button_state = 1
     elif re.sw_pin.value() == 0 and re.prev_button_state == 1:
         re.prev_button_state = 0
 
