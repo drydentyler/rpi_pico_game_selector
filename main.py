@@ -2,9 +2,7 @@ from game import Game
 from lcd_wrapper import LCDWrapper
 from machine import Pin
 from rotary_encoder import RotaryEncoder
-# TODO: rename webserver class
-# TODO: webserver_new_class also doesn't match any available files
-from webserver_new_class import Webserver
+from webserver import Webserver
 from games_db_wrapper import DBWrapper
 
 
