@@ -72,6 +72,25 @@ def get_random_game_wrapper(qtr_counter: int):
     print(qtr_counter)
     return db.get_random_game(players=get_players(), duration=qtr_counter, complexity=False)
 
+def set_display():
+    """
+    Cycle through displaying the webserver IP address, desired duration and randomly selected game on the LCD screen
+    """
+    global displays, display_index
+    
+    # Unpack the function and argumentsfrom the displays list and call the function, passing in the arguments
+    func, params = displays[display_index]
+    func(params)
+    
+    # If the display index is 2, the end of the displays list, reset it to 0
+    if display_index == 2:
+        display_index = 0
+    # Otherwise, increment by 1
+    else:
+        display_index += 1
+    
+    print(display_index)
+
 def button_handler(pin):
     """
     Handler function for the rotary encoder button
@@ -122,17 +141,6 @@ re.sw_pin.irq(trigger=Pin.IRQ_RISING | Pin.IRQ_FALLING, handler=button_handler)
 priority_encoder_a0 = Pin(10, Pin.IN)
 priority_encoder_a1 = Pin(11, Pin.IN)
 priority_encoder_a2 = Pin(12, Pin.IN)
-
-def set_display():
-    global displays, display_index
-    
-    func, params = displays[display_index]
-    func(params)
-    
-    if display_index == 2:
-        display_index = 0
-    else:
-        display_index += 1
 
 displays = [[lcd.display_ip, None], [lcd.display_duration, re.qtr_counter], [lcd.display_game, None]]
 display_index = 0
