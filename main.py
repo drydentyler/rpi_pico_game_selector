@@ -139,7 +139,16 @@ with Webserver() as ws:
     # Display the IP address on the LCD
     lcd.display_ip(ws.ip)
     displaying_ip = True
+    prev_status = None
 
     while True:
-        # Serve client requests from the webserver
-        ws.serve(ws.connection)
+        try:
+            # Serve client requests from the webserver
+            new_game_params = ws.serve(ws.connection, prev_status)
+            print(f'new game params: {new_game_params}')
+            if new_game_params:
+                print(f'previous status: {prev_status}')
+                prev_status = db.insert_game(Game(None, *new_game_params))
+                print(f'new status: {prev_status}')
+        except StopIteration:
+            pass
