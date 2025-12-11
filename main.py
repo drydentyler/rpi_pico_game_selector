@@ -49,6 +49,21 @@ def encoder_handler(pin):
             re.last_qtr_counter = re.qtr_counter
             lcd.update_duration(re.qtr_counter)
 
+def get_players() -> int:
+    """
+    Read the output values from the 8:3 priority encoder and convert to decimal value
+    
+    Returns:
+        int: decimal value of number of players
+    """
+    global priority_encoder_a0, priority_encoder_a1, priority_encoder_a2
+    
+    curr_a0 = priority_encoder_a0.value()
+    curr_a1 = priority_encoder_a1.value()
+    curr_a2 = priority_encoder_a2.value()
+    
+    return (curr_a2*4)+(curr_a1*2)+curr_a0+1
+
 
 def button_handler(pin):
     """
