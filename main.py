@@ -139,8 +139,6 @@ with Webserver() as ws:
     displays[0][1] = ws.ip
     set_display()
     
-    # Display the IP address on the LCD
-    # lcd.display_ip(ws.ip)
     displaying_ip = True
     prev_status = None
 
