@@ -98,8 +98,6 @@ def button_handler(pin):
     Args:
         Pin: unused but required
     """
-    # TODO: maybe make pressing the button cycle through the duration/ip/game name, that way you can always return to see the ip address for the webserver
-
     # Will need access to the LCD, Rotary Encoder, Database, and displaying_ip bool
     global re, display_index, displays
 
