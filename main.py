@@ -134,10 +134,27 @@ priority_encoder_a0 = Pin(10, Pin.IN)
 priority_encoder_a1 = Pin(11, Pin.IN)
 priority_encoder_a2 = Pin(12, Pin.IN)
 
+def set_display():
+    global displays, display_index
+    
+    func, params = displays[display_index]
+    func(params)
+    
+    if display_index == 2:
+        display_index = 0
+    else:
+        display_index += 1
+
+displays = [[lcd.display_ip, None], [lcd.display_duration, re.qtr_counter], [lcd.display_game, None]]
+display_index = 0
+
 # Create the Webserver context manager
 with Webserver() as ws:
+    displays[0][1] = ws.ip
+    set_display()
+    
     # Display the IP address on the LCD
-    lcd.display_ip(ws.ip)
+    # lcd.display_ip(ws.ip)
     displaying_ip = True
     prev_status = None
 
