@@ -98,7 +98,7 @@ def button_handler(pin):
                 # is_complex = complexity_toggle.value()
                 # TODO: need to incorporate the objects for the players rotary switch and complexity toggle
                 # TODO: Replace the complexity parameter with the reading from the toggle and players rotary switch
-                game = db.get_random_game(players=2, duration=re.qtr_counter, complexity=False)
+                game = db.get_random_game(players=get_players(), duration=re.qtr_counter, complexity=False)
 
                 # Display the game selected from the database
                 lcd.display_game(game)
