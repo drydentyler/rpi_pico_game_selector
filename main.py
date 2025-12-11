@@ -49,6 +49,21 @@ def encoder_handler(pin):
             re.last_qtr_counter = re.qtr_counter
             lcd.update_duration(re.qtr_counter)
 
+def get_players() -> int:
+    """
+    Read the output values from the 8:3 priority encoder and convert to decimal value
+    
+    Returns:
+        int: decimal value of number of players
+    """
+    global priority_encoder_a0, priority_encoder_a1, priority_encoder_a2
+    
+    curr_a0 = priority_encoder_a0.value()
+    curr_a1 = priority_encoder_a1.value()
+    curr_a2 = priority_encoder_a2.value()
+    
+    return (curr_a2*4)+(curr_a1*2)+curr_a0+1
+
 
 def button_handler(pin):
     """
@@ -83,7 +98,7 @@ def button_handler(pin):
                 # is_complex = complexity_toggle.value()
                 # TODO: need to incorporate the objects for the players rotary switch and complexity toggle
                 # TODO: Replace the complexity parameter with the reading from the toggle and players rotary switch
-                game = db.get_random_game(players=2, duration=re.qtr_counter, complexity=False)
+                game = db.get_random_game(players=get_players(), duration=re.qtr_counter, complexity=False)
 
                 # Display the game selected from the database
                 lcd.display_game(game)
@@ -114,6 +129,10 @@ re.clk_pin.irq(trigger=Pin.IRQ_RISING | Pin.IRQ_FALLING, handler=encoder_handler
 re.dt_pin.irq(trigger=Pin.IRQ_RISING | Pin.IRQ_FALLING, handler=encoder_handler)
 
 re.sw_pin.irq(trigger=Pin.IRQ_RISING | Pin.IRQ_FALLING, handler=button_handler)
+
+priority_encoder_a0 = Pin(10, Pin.IN)
+priority_encoder_a1 = Pin(11, Pin.IN)
+priority_encoder_a2 = Pin(12, Pin.IN)
 
 # Create the Webserver context manager
 with Webserver() as ws:
