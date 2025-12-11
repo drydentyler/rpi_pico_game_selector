@@ -1,9 +1,7 @@
 from game import Game
 from lcd_wrapper import LCDWrapper
 from machine import Pin
-# TODO: rename rotary encoder file
-# TODO: rotary_encoder_new_class doesn't even match any of the rotary encoder files
-from rotary_encoder_new_class import RotaryEncoder
+from rotary_encoder import RotaryEncoder
 # TODO: rename webserver class
 # TODO: webserver_new_class also doesn't match any available files
 from webserver_new_class import Webserver
