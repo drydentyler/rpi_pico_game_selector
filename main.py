@@ -13,7 +13,7 @@ def encoder_handler(pin):
     Args:
         Pin, unused but required
     """
-    # Will need to access the LCD, Rotary Encoder and displaying_ip bool
+    # Will need to access the LCD, Rotary Encoder and display_index value
     global lcd, re, display_index
 
     # Read the current states of the CLK and DT pins
@@ -70,7 +70,6 @@ def get_random_game_wrapper(qtr_counter: int):
     Wrapper function to the database call to get the randomly selected game
     """
     global db
-    print(qtr_counter)
     return db.get_random_game(players=get_players(), duration=qtr_counter, complexity=False)
 
 def set_display():
@@ -89,8 +88,6 @@ def set_display():
     # Otherwise, increment by 1
     else:
         display_index += 1
-    
-    print(display_index)
 
 def button_handler(pin):
     """
@@ -137,19 +134,21 @@ re.dt_pin.irq(trigger=Pin.IRQ_RISING | Pin.IRQ_FALLING, handler=encoder_handler)
 
 re.sw_pin.irq(trigger=Pin.IRQ_RISING | Pin.IRQ_FALLING, handler=button_handler)
 
+# Priority Encoder output pins
 priority_encoder_a0 = Pin(10, Pin.IN)
 priority_encoder_a1 = Pin(11, Pin.IN)
 priority_encoder_a2 = Pin(12, Pin.IN)
 
+# List of the different functions and arguments needed to cycle through on the LCD screen
 displays = [[lcd.display_ip, None], [lcd.display_duration, re.qtr_counter], [lcd.display_game, None]]
 display_index = 0
 
 # Create the Webserver context manager
 with Webserver() as ws:
+    # Set the argument associated with the display_ip function to the generated IP address and display it on LCD
     displays[0][1] = ws.ip
     set_display()
     
-    displaying_ip = True
     prev_status = None
 
     while True:
