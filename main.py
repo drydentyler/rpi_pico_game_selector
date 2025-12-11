@@ -13,16 +13,17 @@ def encoder_handler(pin):
     Args:
         Pin, unused but required
     """
-    # Will need to access the LCD, Rotary Encoder and displaying_ip bool
-    global lcd, re, displaying_ip
+    # Will need to access the LCD, Rotary Encoder and display_index value
+    global lcd, re, display_index
 
     # Read the current states of the CLK and DT pins
     clk_state = re.clk_pin.value()
     dt_state = re.dt_pin.value()
 
-    # TODO: I don't love the variable name displaying_ip because it could display anything other than duration
+    #********SOMETIMES FAULTY WIRING LIKE A LOOSE CONNECTION CAN CAUSE THE ROTARY ENCODER TO NOT BE READ PROPERLY******
     # The IP and Game result are not being displayed, check the encoder values and update LCD
-    if not displaying_ip and not re.button_pressed:
+    # This needs to be index 2 because the display index is incremented at the end of the set_display function
+    if display_index == 2:
         if clk_state == re.prev_clk_state and dt_state == re.prev_dt_state:
             # This is an error, if this handler was called but the states didn't change
             pass
@@ -64,6 +65,29 @@ def get_players() -> int:
     
     return (curr_a2*4)+(curr_a1*2)+curr_a0+1
 
+def get_random_game_wrapper(qtr_counter: int):
+    """
+    Wrapper function to the database call to get the randomly selected game
+    """
+    global db
+    return db.get_random_game(players=get_players(), duration=qtr_counter, complexity=False)
+
+def set_display():
+    """
+    Cycle through displaying the webserver IP address, desired duration and randomly selected game on the LCD screen
+    """
+    global displays, display_index
+    
+    # Unpack the function and argumentsfrom the displays list and call the function, passing in the arguments
+    func, params = displays[display_index]
+    func(params)
+    
+    # If the display index is 2, the end of the displays list, reset it to 0
+    if display_index == 2:
+        display_index = 0
+    # Otherwise, increment by 1
+    else:
+        display_index += 1
 
 def button_handler(pin):
     """
@@ -72,40 +96,20 @@ def button_handler(pin):
     Args:
         Pin: unused but required
     """
-    # TODO: maybe make pressing the button cycle through the duration/ip/game name, that way you can always return to see the ip address for the webserver
-
     # Will need access to the LCD, Rotary Encoder, Database, and displaying_ip bool
-    global lcd, displaying_ip, re, db
+    global re, display_index, displays
 
     # Temporarily set the button handler function to None to prevent conflicting function calls
     re.sw_pin.irq(handler=None)
 
     # If button current state is High and previous state was low
     if re.sw_pin.value() == 1 and re.prev_button_state == 0:
-        # TODO: functionally these top two conditions are the same, condense them somehow
-        # If the IP is currently displayed, replace with the duration display
-        if displaying_ip:
-            lcd.display_duration(re.qtr_counter)
-            displaying_ip = False
-        else:
-            # Else a game result is displayed, replace with the duration display
-            if re.button_pressed:
-                lcd.display_duration(re.qtr_counter)
-                re.button_pressed = False
-            else:
-                # Otherwise, get the additional parameter readings to query the database
-                # Check the complexity toggle state, High->True, Low->False
-                # is_complex = complexity_toggle.value()
-                # TODO: need to incorporate the objects for the players rotary switch and complexity toggle
-                # TODO: Replace the complexity parameter with the reading from the toggle and players rotary switch
-                game = db.get_random_game(players=get_players(), duration=re.qtr_counter, complexity=False)
-
-                # Display the game selected from the database
-                lcd.display_game(game)
-
-                # Set the previous button state and displaying result to True(1)
-                re.prev_button_state = 1
-                re.button_pressed = True
+        
+        if display_index == 2:
+            displays[display_index][1] = get_random_game_wrapper(re.qtr_counter)
+        
+        set_display()
+        re.prev_button_state = 1
     elif re.sw_pin.value() == 0 and re.prev_button_state == 1:
         re.prev_button_state = 0
 
@@ -130,15 +134,21 @@ re.dt_pin.irq(trigger=Pin.IRQ_RISING | Pin.IRQ_FALLING, handler=encoder_handler)
 
 re.sw_pin.irq(trigger=Pin.IRQ_RISING | Pin.IRQ_FALLING, handler=button_handler)
 
+# Priority Encoder output pins
 priority_encoder_a0 = Pin(10, Pin.IN)
 priority_encoder_a1 = Pin(11, Pin.IN)
 priority_encoder_a2 = Pin(12, Pin.IN)
 
+# List of the different functions and arguments needed to cycle through on the LCD screen
+displays = [[lcd.display_ip, None], [lcd.display_duration, re.qtr_counter], [lcd.display_game, None]]
+display_index = 0
+
 # Create the Webserver context manager
 with Webserver() as ws:
-    # Display the IP address on the LCD
-    lcd.display_ip(ws.ip)
-    displaying_ip = True
+    # Set the argument associated with the display_ip function to the generated IP address and display it on LCD
+    displays[0][1] = ws.ip
+    set_display()
+    
     prev_status = None
 
     while True:
