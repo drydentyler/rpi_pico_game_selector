@@ -115,6 +115,10 @@ re.dt_pin.irq(trigger=Pin.IRQ_RISING | Pin.IRQ_FALLING, handler=encoder_handler)
 
 re.sw_pin.irq(trigger=Pin.IRQ_RISING | Pin.IRQ_FALLING, handler=button_handler)
 
+priority_encoder_a0 = Pin(10, Pin.IN)
+priority_encoder_a1 = Pin(11, Pin.IN)
+priority_encoder_a2 = Pin(12, Pin.IN)
+
 # Create the Webserver context manager
 with Webserver() as ws:
     # Display the IP address on the LCD
