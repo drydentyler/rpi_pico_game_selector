@@ -14,15 +14,16 @@ def encoder_handler(pin):
         Pin, unused but required
     """
     # Will need to access the LCD, Rotary Encoder and displaying_ip bool
-    global lcd, re, displaying_ip
+    global lcd, re, display_index
 
     # Read the current states of the CLK and DT pins
     clk_state = re.clk_pin.value()
     dt_state = re.dt_pin.value()
 
-    # TODO: I don't love the variable name displaying_ip because it could display anything other than duration
+    #********SOMETIMES FAULTY WIRING LIKE A LOOSE CONNECTION CAN CAUSE THE ROTARY ENCODER TO NOT BE READ PROPERLY******
     # The IP and Game result are not being displayed, check the encoder values and update LCD
-    if not displaying_ip and not re.button_pressed:
+    # This needs to be index 2 because the display index is incremented at the end of the set_display function
+    if display_index == 2:
         if clk_state == re.prev_clk_state and dt_state == re.prev_dt_state:
             # This is an error, if this handler was called but the states didn't change
             pass
